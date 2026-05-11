@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f4f4f0; font-family: 'IBM Plex Sans', sans-serif; }
+  .wrap { padding: 24px; overflow-x: auto; min-width: 960px; }
+
+  h2 {
+    font-size: 14px; font-weight: 700; color: #111;
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 10.5px; color: #666; margin-bottom: 14px; font-weight: 400;
+  }
+  .subtitle span {
+    display: inline-block;
+    background: #1a1a2e;
+    color: #fff;
+    border-radius: 3px;
+    padding: 1px 7px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 18px; align-items: center;
+  }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #333; font-weight: 500; }
+  .leg-swatch { width: 14px; height: 14px; border-radius: 2px; flex-shrink: 0; }
+  .leg-sep { width: 1px; height: 16px; background: #ccc; margin: 0 4px; }
+
+  /* ── Grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 110px repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  /* ── Row labels ── */
+  .row-label {
+    background: #1a1a2e; color: #fff;
+    font-size: 10px; font-weight: 600;
+    padding: 8px 6px; border-radius: 4px;
+    display: flex; align-items: center;
+    justify-content: center; text-align: center;
+    line-height: 1.4; letter-spacing: 0.2px;
+  }
+  .row-label.dispute { background: #2d1b4e; }
+
+  .empty { background: transparent; }
+
+  /* ── Feature boxes ── */
+  .box {
+    border-radius: 5px;
+    padding: 7px 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    position: relative;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .box-done    { background: #d4edda; border: 1.5px solid #2e7d45; color: #1a3d28; }
+  .box-inprog  { background: #eaf7ec; border: 1.5px solid #66bb6a; color: #1a3d28; }
+  .box-pending { background: #fde8e8; border: 1.5px solid #c0392b; color: #5a1010; }
+  .box-design  { background: #fef9e7; border: 1.5px solid #d4ac0d; color: #5a4200; }
+  .box-new     { background: #eaf2ff; border: 2px dashed #2962ff; color: #0d2d8a; }
+  .box-new .new-tag {
+    font-size: 8.5px; font-weight: 700; color: #2962ff;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;
+  }
+
+  /* Sub-label (e.g. Visibility of Cash with Partner) */
+  .sub-label {
+    font-size: 9px; font-weight: 400; opacity: 0.75;
+    margin-top: 3px; border-top: 1px solid rgba(0,0,0,0.10);
+    padding-top: 3px; font-style: italic;
+  }
+
+  /* Sub bullets */
+  .sub { font-size: 9.5px; font-weight: 400; margin-top: 3px; padding-left: 8px; list-style: none; }
+  .sub li::before { content: "·"; margin-right: 4px; }
+
+  /* ── Hover-only PRD blocks ── */
+  .prd-block {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.22s ease, opacity 0.18s ease, margin-top 0.18s ease, padding-top 0.18s ease;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+  .box:hover .prd-block {
+    max-height: 300px;
+    opacity: 1;
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(0,0,0,0.10);
+  }
+
+  /* Hover hint dots — hidden when hovering */
+  .has-prd { cursor: help; }
+  .has-prd::after {
+    content: "· · ·";
+    display: block;
+    font-size: 9px;
+    opacity: 0.32;
+    margin-top: 5px;
+    letter-spacing: 3px;
+    text-align: center;
+    font-weight: 400;
+    transition: opacity 0.15s;
+  }
+  .has-prd:hover::after { opacity: 0; }
+  .has-prd:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+  }
+
+  .prd-desc {
+    font-size: 9.5px; font-weight: 400;
+    line-height: 1.35; margin-top: 3px; opacity: 0.85;
+  }
+
+  /* ── Badges ── */
+  .badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.5px; font-weight: 500;
+    padding: 1px 5px; border-radius: 2px;
+    white-space: nowrap; color: white;
+  }
+  .b-p0      { background: #c0392b; }
+  .b-p1      { background: #d35400; }
+  .b-p2      { background: #1a5276; }
+  .b-p3      { background: #555; }
+  .b-eng     { background: #6c3483; }
+  .b-signoff { background: #b7770d; }
+  .b-queue   { background: #2c3e50; }
+  .b-indev   { background: #0e6655; }
+  .b-blocked { background: #922b21; }
+  .b-size    { background: #444; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Cash Collection &amp; Reconciliation — Feature Map with PRDs</h2>
+  <p class="subtitle">Hover over any box to reveal PRD details &nbsp;<span>hover for details</span></p>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="leg"><div class="leg-swatch" style="background:#d4edda;border:1.5px solid #2e7d45;"></div> Live / Done</div>
+    <div class="leg"><div class="leg-swatch" style="background:#eaf7ec;border:1.5px solid #66bb6a;"></div> Launched (partial)</div>
+    <div class="leg"><div class="leg-swatch" style="background:#fef9e7;border:1.5px solid #d4ac0d;"></div> In Design / In Queue</div>
+    <div class="leg"><div class="leg-swatch" style="background:#fde8e8;border:1.5px solid #c0392b;"></div> Pending / Blocked</div>
+    <div class="leg"><div class="leg-swatch" style="background:#eaf2ff;border:2px dashed #2962ff;"></div> New PRD Addition</div>
+    <div class="leg-sep"></div>
+    <div class="leg"><span class="badge b-p0">P0</span> Critical</div>
+    <div class="leg"><span class="badge b-p1">P1</span> High</div>
+    <div class="leg"><span class="badge b-p2">P2</span> Medium</div>
+    <div class="leg"><span class="badge b-p3">P3</span> Low</div>
+    <div class="leg-sep"></div>
+    <div class="leg"><span class="badge b-eng">Eng</span> Handed to Eng</div>
+    <div class="leg"><span class="badge b-signoff">Sign</span> Pending Signoff</div>
+    <div class="leg"><span class="badge b-queue">Q</span> In Queue</div>
+    <div class="leg"><span class="badge b-indev">Dev</span> In Development</div>
+    <div class="leg"><span class="badge b-blocked">!</span> Blocked</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ══════════════════════════════════════
+         ROW 1: Cash Borrower → Agent
+    ══════════════════════════════════════ -->
+    <div class="row-label">Cash from<br>Borrower<br>to Agent</div>
+
+    <div class="box box-done">Collection via QR Code</div>
+
+    <div class="box box-done">Collection via UPI</div>
+
+    <div class="box box-done">
+      Agent collects for other branches
+      <ul class="sub"><li>Wallet splits</li></ul>
+    </div>
+
+    <div class="box box-done">Core Cash Collection Module</div>
+
+    <div class="box box-inprog has-prd">
+      Collection via BBPS
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">S</span><span class="badge b-indev">In Development</span></div>
+        <div class="prd-desc">API Integration — Pending Launch</div>
+      </div>
+    </div>
+
+    <div class="box box-done">Rectification of CCM entries</div>
+
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 2: Instant Customer Credit
+    ══════════════════════════════════════ -->
+    <div class="row-label">Instant<br>Customer<br>Credit</div>
+
+    <div class="box box-done">Any submission = Credit to loan account</div>
+
+    <div class="box box-done has-prd">
+      Backdated entry of repayment on platform
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p3">P3</span><span class="badge b-size">M</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">Restrict backdated repayment entry to ≤3 days from date of collection</div>
+      </div>
+    </div>
+
+    <div class="box box-design has-prd">
+      Concurrent Txn Resolution
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p0">P0</span><span class="badge b-indev">In Development</span></div>
+      </div>
+    </div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 3: Agent → Branch (L1)
+    ══════════════════════════════════════ -->
+    <div class="row-label">Cash<br>Agent →<br>Branch<br>(L1)</div>
+
+    <div class="box box-inprog">Visibility of Cash with Agent</div>
+
+    <div class="box box-done">
+      Txn to Branch level Manager
+      <ul class="sub">
+        <li>Pay &amp; Collect button</li>
+        <li>Collection UI for CM</li>
+      </ul>
+    </div>
+
+    <div class="box box-done">Ability to transact cash to Branch level Manager</div>
+
+    <div class="box box-design has-prd">
+      Ability to rectify interwallet transactions
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">M</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">+ LOA reverse inter-wallet txn</div>
+        <div class="badges" style="margin-top:5px;"><span class="badge b-p2">P2</span><span class="badge b-size">L</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">+ Bulk import for inter-wallet txns</div>
+      </div>
+    </div>
+
+    <div class="box box-design">Branch Cash Manager Dashboard</div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 4: Branch → Partner (L2)
+    ══════════════════════════════════════ -->
+    <div class="row-label">Cash<br>Branch →<br>Partner<br>(L2)</div>
+
+    <div class="empty"></div>
+
+    <div class="box box-done">Cash Position Table: branch cash across branches</div>
+
+    <div class="box box-done">
+      Ability to transact cash to Partner level Manager
+      <ul class="sub">
+        <li>Pay &amp; Collect button</li>
+        <li>Collection UI for CM</li>
+      </ul>
+    </div>
+
+    <div class="box box-design has-prd">
+      Ability to rectify interwallet transactions
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">M</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">+ LOA reverse inter-wallet txn</div>
+        <div class="badges" style="margin-top:5px;"><span class="badge b-p2">P2</span><span class="badge b-size">L</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">+ Bulk import for inter-wallet txns</div>
+      </div>
+    </div>
+
+    <div class="box box-design">
+      Partner Cash Manager Dashboard
+      <div class="sub-label">incl. Visibility of Cash with Partner</div>
+    </div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 5: Cash to Lender
+    ══════════════════════════════════════ -->
+    <div class="row-label">Cash<br>to Lender</div>
+
+    <div class="box box-done has-prd">
+      Ability to perform 'to lender' transaction
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">L</span><span class="badge b-signoff">Pending Signoff</span></div>
+        <div class="prd-desc">+ Backdated Lending Org txn</div>
+      </div>
+    </div>
+
+    <div class="box box-design has-prd">
+      Lending Org Admin Dashboard
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">XL</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">+ Lender &amp; Partner Dashboard (same box)</div>
+      </div>
+    </div>
+
+    <div class="box box-pending has-prd">
+      Ability to handle negative balance
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">M</span><span class="badge b-queue">In Queue</span></div>
+        <div class="prd-desc">+ Handle negative wallet balances (ecollect)</div>
+      </div>
+    </div>
+
+    <div class="box box-new has-prd">
+      <div class="new-tag">⊕ New Box</div>
+      Filter ecollect txns on platform using reports
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">S</span><span class="badge b-queue">In Queue</span></div>
+      </div>
+    </div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 6: Dispute Management
+    ══════════════════════════════════════ -->
+    <div class="row-label dispute">Dispute<br>Management</div>
+
+    <div class="box box-new has-prd">
+      <div class="new-tag">⊕ New · Step 1</div>
+      LOA reversal of inter-wallet txn
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">M</span><span class="badge b-signoff">Pending Signoff</span></div>
+      </div>
+    </div>
+
+    <div class="box box-done has-prd">
+      Ability to dispute a transaction
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">S</span><span class="badge b-signoff">Pending Signoff</span></div>
+        <div class="prd-desc">+ Add Approval &amp; Dispute Timestamps</div>
+      </div>
+    </div>
+
+    <div class="box box-pending has-prd">
+      Ability to mark a transaction verified
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">S</span><span class="badge b-eng">Handed to Eng</span></div>
+        <div class="prd-desc">+ Mark verified 'to lender' txns by Avanti Ops</div>
+      </div>
+    </div>
+
+    <div class="box box-new has-prd">
+      <div class="new-tag">⊕ New Box</div>
+      Disputed txn notifications to sender
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">M</span><span class="badge b-queue">In Queue</span></div>
+      </div>
+    </div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 7: Lender Bank Recon
+    ══════════════════════════════════════ -->
+    <div class="row-label">Lender<br>Bank Recon</div>
+
+    <div class="box box-done has-prd" style="grid-column: span 2;">
+      Ability to recon lender txn against bank statement
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p0">P0</span><span class="badge b-size">S</span><span class="badge b-eng">Handed to Eng</span></div>
+        <div class="prd-desc">+ Correct bank statement txn ID in platform (UTR mismatch fix)</div>
+      </div>
+    </div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+
+    <!-- ══════════════════════════════════════
+         ROW 8: Analytics & Performance
+    ══════════════════════════════════════ -->
+    <div class="row-label">Analytics &amp;<br>Performance</div>
+
+    <div class="box box-pending has-prd">
+      Operational Collections View
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">XL</span><span class="badge b-blocked">Blocked</span></div>
+        <div class="prd-desc">Blocked in engineering feasibility — exploring AI dashboarding workaround</div>
+      </div>
+    </div>
+
+    <div class="box box-pending has-prd">
+      Actionable Collections View
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p2">P2</span><span class="badge b-size">XL</span><span class="badge b-blocked">Blocked</span></div>
+        <div class="prd-desc">Blocked in engineering feasibility — exploring AI dashboarding workaround</div>
+      </div>
+    </div>
+
+    <div class="box box-new has-prd">
+      <div class="new-tag">⊕ New Box</div>
+      Branch User Balances for Each Day in Branch Topic &amp; BQ
+      <div class="prd-block">
+        <div class="badges"><span class="badge b-p1">P1</span><span class="badge b-size">M</span><span class="badge b-signoff">Pending Signoff</span></div>
+        <div class="prd-desc">RT-3931 — Engg Queued</div>
+      </div>
+    </div>
+
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+    <div class="empty"></div>
+
+  </div><!-- /grid -->
+</div>
+</body>
+</html>
