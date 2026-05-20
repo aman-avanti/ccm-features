@@ -1,39 +1,76 @@
-# CCM Feature Map
+# Cash Collection & Reconciliation — Feature Map
 
-Cash Collection & Reconciliation — feature map with hover-revealed PRD details.
+An interactive feature map for Avanti Finance's **Cash Collection & Reconciliation (CCM)** module.
 
-**Live:** https://aman-avanti.github.io/ccm-features/
+🔗 **[View Live →](https://aman-avanti.github.io/ccm-features/)**
 
-## Layout
+---
 
-A single static page (`index.html`) renders a grid of CCM features grouped by row, each colour-coded by status:
+## What This Is
 
-- Done
-- In Progress
-- Design
-- Pending
-- New
+A single-page visual overview of the end-to-end cash journey — from borrower to lender — across 8 stages. It maps every shipped feature and every PRD in the pipeline, with live development status for each.
 
-Hover any box to surface its PRD summary.
+Built to help product, engineering, and operations teams get a shared view of where we are and what's left to close.
 
-## Local preview
+---
 
-Open `index.html` directly in a browser, or serve the directory:
+## How to Use
 
-```sh
-python3 -m http.server 8000
-# then visit http://localhost:8000
-```
+- **Hover** over any box to reveal PRD details — priority, size, and current development status
+- **Box colour** indicates status at a glance (see legend below)
+- **Always-visible priority tags** on red boxes flag items needing immediate attention
 
-## Updating
+---
 
-The page is generated from a source flowchart (`ccm_prd_flowchart_v*.html`). To publish a new version:
+## Status Legend
 
-```sh
-cp ~/Downloads/ccm_prd_flowchart_vN.html index.html
-git add index.html
-git commit -m "Update CCM feature map - vN"
-git push
-```
+| Colour | Meaning |
+|--------|---------|
+| 🟢 Green | Launched / In Production |
+| 🟩 Light Green | Launched — modification or improvement pending |
+| 🟡 Yellow | In QA / In Development / In Eng Queue |
+| 🔴 Red | Pending Eng Review / PRD in Progress / In Design |
+| 🔵 Blue dashed | Prioritised / New |
 
-GitHub Pages picks up the change on `main` within a minute or two.
+### Priority Tags
+
+| Badge | Priority |
+|-------|----------|
+| `P0` | Critical |
+| `P1` | High |
+| `P2` | Medium |
+| `P3` | Low |
+
+### Status Badges (visible on hover)
+
+| Badge | Status |
+|-------|--------|
+| `PER` | Pending Eng Review |
+| `IEQ` | In Eng Queue |
+| `Dev` | In Development |
+| `ID` | In Design / PRD in Progress |
+
+---
+
+## Coverage
+
+| Journey Stage | Features Mapped |
+|---|---|
+| Cash: Borrower → Agent | QR Code, UPI, Wallet Splits, Core CCM, BBPS, Rectification, Actionable Collections View |
+| Instant Customer Credit | Platform credit, Backdated repayment, Concurrent Txn Resolution |
+| Cash: Agent → Branch (L1) | Visibility, Transactions, Interwallet rectification, Branch CM Dashboard |
+| Cash: Branch → Partner (L2) | Cash Position Table, Transactions, Interwallet rectification, Partner CM Dashboard |
+| Cash to Lender | To-lender txn, Lending Org Dashboard, Negative balance, Ecollect filters |
+| Dispute Management | LOA reversal, Dispute flow, Transaction verification, Notifications |
+| Lender Bank Recon | Bank statement reconciliation |
+| Analytics & Performance | Operational Collections View, Branch User Balances |
+
+---
+
+## Tech
+
+Plain HTML, CSS, and vanilla JS — no frameworks, no build step. Open `index.html` directly in any browser or serve via GitHub Pages.
+
+---
+
+*Maintained by the Avanti Finance Product team.*
